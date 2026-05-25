@@ -1,0 +1,1453 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>บัญชีส่วนตัว</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f4;
+      --surface: #ffffff;
+      --surface-2: #eef4ef;
+      --ink: #17201b;
+      --muted: #657269;
+      --line: #d9e1dc;
+      --green: #237a57;
+      --green-soft: #dff2e9;
+      --red: #b54545;
+      --red-soft: #f7e3e3;
+      --blue: #2e628f;
+      --gold: #a66b20;
+      --shadow: 0 16px 44px rgba(25, 39, 31, .12);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(35,122,87,.10), rgba(246,247,244,0) 310px),
+        var(--bg);
+      color: var(--ink);
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app-shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 32px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, #237a57, #2e628f);
+      box-shadow: var(--shadow);
+      flex: 0 0 auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.45rem, 2vw, 2rem);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .sub {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      min-height: 40px;
+      border-radius: 8px;
+      padding: 0 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      box-shadow: 0 2px 8px rgba(20, 31, 24, .05);
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+    }
+
+    .btn.danger {
+      color: var(--red);
+    }
+
+    .btn.icon {
+      width: 38px;
+      padding: 0;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 116px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 22px rgba(20, 31, 24, .06);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .metric strong {
+      font-size: clamp(1.35rem, 2.5vw, 2.05rem);
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+
+    .metric .income { color: var(--green); }
+    .metric .expense { color: var(--red); }
+    .metric .balance { color: var(--blue); }
+
+    .summary-board {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) repeat(3, minmax(0, .8fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 8px 22px rgba(20, 31, 24, .06);
+      min-height: 132px;
+      display: grid;
+      align-content: space-between;
+      gap: 12px;
+    }
+
+    .summary-card h2 {
+      font-size: .95rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .flow-bar {
+      height: 18px;
+      display: flex;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+    }
+
+    .flow-bar span {
+      min-width: 0;
+      height: 100%;
+    }
+
+    .flow-income { background: var(--green); }
+    .flow-expense { background: var(--red); }
+
+    .flow-legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: .84rem;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+    .dot.income { background: var(--green); }
+    .dot.expense { background: var(--red); }
+
+    .pie-card {
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .pie-wrap {
+      min-height: 148px;
+      display: grid;
+      place-items: center;
+    }
+
+    #summaryPieChart {
+      width: 100%;
+      max-width: 230px;
+      height: 148px;
+      border: 0;
+      background: transparent;
+    }
+
+    .summary-value {
+      font-size: clamp(1.25rem, 2vw, 1.65rem);
+      font-weight: 850;
+      line-height: 1.1;
+      overflow-wrap: anywhere;
+    }
+
+    .summary-value.expense { color: var(--red); }
+
+    .summary-note {
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.35;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 390px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 28px rgba(20, 31, 24, .07);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      letter-spacing: 0;
+    }
+
+    .form {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 42px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fbfcfb;
+      color: var(--ink);
+      padding: 9px 11px;
+      outline: 0;
+    }
+
+    textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(35, 122, 87, .16);
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-2);
+    }
+
+    .segmented button {
+      min-height: 38px;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .segmented button.active.income {
+      background: var(--green);
+      color: white;
+    }
+
+    .segmented button.active.expense {
+      background: var(--red);
+      color: white;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1.4fr .9fr .9fr;
+      gap: 10px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfb;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 250px;
+      gap: 0;
+      min-height: 510px;
+    }
+
+    .list-wrap {
+      border-right: 1px solid var(--line);
+      min-width: 0;
+    }
+
+    .transactions {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 510px;
+      overflow: auto;
+    }
+
+    .transaction {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .transaction:last-child {
+      border-bottom: 0;
+    }
+
+    .mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      background: var(--surface-2);
+    }
+
+    .mark.income {
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .mark.expense {
+      color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .tx-main {
+      min-width: 0;
+    }
+
+    .tx-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .tx-title strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 3px 8px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: .78rem;
+      flex: 0 0 auto;
+    }
+
+    .tx-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .84rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tx-side {
+      display: grid;
+      justify-items: end;
+      gap: 6px;
+    }
+
+    .amount {
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .amount.income { color: var(--green); }
+    .amount.expense { color: var(--red); }
+
+    .actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .empty {
+      padding: 38px 18px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .insights {
+      padding: 16px;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    canvas {
+      width: 100%;
+      height: 160px;
+      display: block;
+      background: #fbfcfb;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .category-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .category-row {
+      display: grid;
+      gap: 5px;
+    }
+
+    .cat-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: .86rem;
+    }
+
+    .bar {
+      height: 8px;
+      background: var(--surface-2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--gold);
+      border-radius: inherit;
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.45;
+    }
+
+    .sync-status {
+      min-height: 20px;
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.35;
+    }
+
+    .sync-status.ok { color: var(--green); }
+    .sync-status.pending { color: var(--blue); }
+    .sync-status.warn { color: var(--gold); }
+
+    dialog {
+      width: min(390px, calc(100% - 32px));
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0;
+      color: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    dialog::backdrop {
+      background: rgba(23, 32, 27, .34);
+    }
+
+    .dialog-body {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .dialog-body p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding-top: 4px;
+    }
+
+    .hidden-file {
+      display: none;
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 960px) {
+      .dashboard {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .summary-board {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .list-wrap {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+    }
+
+    @media (max-width: 680px) {
+      .app-shell {
+        width: min(100% - 20px, 1180px);
+        padding-top: 14px;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .dashboard, .summary-board, .row, .filters {
+        grid-template-columns: 1fr;
+      }
+
+      .transaction {
+        grid-template-columns: 36px minmax(0, 1fr);
+      }
+
+      .mark {
+        width: 36px;
+        height: 36px;
+      }
+
+      .tx-side {
+        grid-column: 2;
+        justify-items: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 18V7a2 2 0 0 1 2-2h12v14H6a2 2 0 0 1-2-2Z"></path><path d="M8 9h7"></path><path d="M8 13h4"></path></svg>
+        </div>
+        <div>
+          <h1>บัญชีส่วนตัว</h1>
+          <p class="sub">บันทึกรายรับรายจ่าย เก็บข้อมูลไว้ในเครื่องนี้</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn" id="exportBtn" title="ส่งออกข้อมูล">
+          <svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg>
+          JSON
+        </button>
+        <button class="btn" id="exportCsvBtn" title="ส่งออกข้อมูลเป็น CSV">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"></path><path d="M4 9h16"></path><path d="M9 4v16"></path></svg>
+          CSV
+        </button>
+        <button class="btn" id="exportGoogleBtn" title="สร้างไฟล์ Google Sheet ใน Google Drive">
+          <svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"></path><path d="M14 3v6h6"></path><path d="M8 13h8"></path><path d="M8 17h8"></path></svg>
+          Google Sheet
+        </button>
+        <button class="btn icon" id="googleSettingsBtn" title="ตั้งค่า Google Drive">
+          <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V22a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1A2 2 0 1 1 4.2 18l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9L4.2 8A2 2 0 1 1 7 5.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1A2 2 0 1 1 19.8 8l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"></path></svg>
+        </button>
+        <button class="btn" id="importBtn" title="นำเข้าข้อมูล">
+          <svg viewBox="0 0 24 24"><path d="M12 21V9"></path><path d="m7 14 5-5 5 5"></path><path d="M5 3h14"></path></svg>
+          นำเข้า
+        </button>
+        <input class="hidden-file" type="file" id="importFile" accept="application/json">
+      </div>
+    </header>
+
+    <section class="dashboard" aria-label="สรุปบัญชี">
+      <article class="metric">
+        <span>รายรับเดือนนี้</span>
+        <strong class="income" id="incomeTotal">฿0</strong>
+      </article>
+      <article class="metric">
+        <span>รายจ่ายเดือนนี้</span>
+        <strong class="expense" id="expenseTotal">฿0</strong>
+      </article>
+      <article class="metric">
+        <span>คงเหลือเดือนนี้</span>
+        <strong class="balance" id="balanceTotal">฿0</strong>
+      </article>
+      <article class="metric">
+        <span>รายการที่แสดง</span>
+        <strong id="countTotal">0</strong>
+      </article>
+    </section>
+
+    <section class="summary-board" aria-label="แดชบอร์ดติดตามบัญชี">
+      <article class="summary-card pie-card">
+        <h2>ภาพรวมเงินเข้าออก</h2>
+        <div class="pie-wrap">
+          <canvas id="summaryPieChart" width="460" height="296" aria-label="Pie chart รายรับรายจ่าย"></canvas>
+        </div>
+        <div class="flow-legend">
+          <span><i class="dot income"></i>รายรับ <strong id="flowIncomeLabel">0%</strong></span>
+          <span><i class="dot expense"></i>รายจ่าย <strong id="flowExpenseLabel">0%</strong></span>
+        </div>
+      </article>
+      <article class="summary-card">
+        <h2>อัตราเก็บเงิน</h2>
+        <div class="summary-value balance" id="savingRate">0%</div>
+        <div class="summary-note" id="savingNote">ยังไม่มีรายรับในเดือนนี้</div>
+      </article>
+      <article class="summary-card">
+        <h2>ใช้จ่ายเฉลี่ยต่อวัน</h2>
+        <div class="summary-value expense" id="dailyAverage">฿0</div>
+        <div class="summary-note" id="dailyAverageNote">คำนวณจากรายจ่ายเดือนนี้</div>
+      </article>
+      <article class="summary-card">
+        <h2>หมวดที่ควรจับตา</h2>
+        <div class="summary-value" id="watchCategory">-</div>
+        <div class="summary-note" id="watchCategoryNote">ยังไม่มีรายจ่ายในเดือนนี้</div>
+      </article>
+    </section>
+
+    <main class="main-grid">
+      <section class="panel" aria-label="เพิ่มรายการ">
+        <div class="panel-head">
+          <h2 id="formTitle">เพิ่มรายการใหม่</h2>
+          <button class="btn danger" id="cancelEditBtn" hidden>ยกเลิกแก้ไข</button>
+        </div>
+        <form class="form" id="entryForm">
+          <div class="segmented" role="group" aria-label="ประเภทรายการ">
+            <button type="button" class="active income" data-type="income">รายรับ</button>
+            <button type="button" data-type="expense">รายจ่าย</button>
+          </div>
+          <label>
+            รายละเอียด
+            <input id="title" autocomplete="off" placeholder="เช่น เงินเดือน, ค่าอาหาร" required>
+          </label>
+          <div class="row">
+            <label>
+              จำนวนเงิน
+              <input id="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+            </label>
+            <label>
+              วันที่
+              <input id="date" type="date" required>
+            </label>
+          </div>
+          <div class="row">
+            <label>
+              หมวดหมู่
+              <select id="category"></select>
+            </label>
+            <label>
+              วิธีจ่าย/รับ
+              <select id="account">
+                <option>เงินสด</option>
+                <option>บัญชีธนาคาร</option>
+                <option>บัตรเครดิต</option>
+                <option>พร้อมเพย์</option>
+                <option>อื่น ๆ</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            บันทึกเพิ่มเติม
+            <textarea id="note" placeholder="ใส่รายละเอียดเพิ่มเติมได้"></textarea>
+          </label>
+          <button class="btn primary" type="submit" id="saveBtn">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><path d="M17 21v-8H7v8"></path><path d="M7 3v5h8"></path></svg>
+            บันทึกรายการ
+          </button>
+          <div class="sync-status" id="syncStatus" aria-live="polite"></div>
+          <p class="helper">ข้อมูลจะถูกบันทึกในเบราว์เซอร์ของเครื่องนี้ หากต้องการย้ายเครื่องให้ใช้ปุ่มส่งออกก่อน</p>
+        </form>
+      </section>
+
+      <section class="panel" aria-label="รายการบัญชี">
+        <div class="panel-head">
+          <h2>รายการบัญชี</h2>
+          <button class="btn danger" id="clearBtn" title="ล้างข้อมูลทั้งหมด">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="m19 6-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>
+            ล้างข้อมูล
+          </button>
+        </div>
+        <div class="filters">
+          <label>
+            ค้นหา
+            <input id="search" placeholder="ค้นหารายละเอียด หมวดหมู่ หรือบันทึก">
+          </label>
+          <label>
+            เดือน
+            <input id="monthFilter" type="month">
+          </label>
+          <label>
+            ประเภท
+            <select id="typeFilter">
+              <option value="all">ทั้งหมด</option>
+              <option value="income">รายรับ</option>
+              <option value="expense">รายจ่าย</option>
+            </select>
+          </label>
+        </div>
+        <div class="content">
+          <div class="list-wrap">
+            <ul class="transactions" id="transactions"></ul>
+            <div class="empty" id="emptyState" hidden>ยังไม่มีรายการในเงื่อนไขนี้</div>
+          </div>
+          <aside class="insights">
+            <div>
+              <h2>ภาพรวมรายวัน</h2>
+              <canvas id="trendChart" width="480" height="320" aria-label="กราฟรายรับรายจ่าย"></canvas>
+            </div>
+            <div>
+              <h2>หมวดรายจ่ายสูงสุด</h2>
+              <div class="category-list" id="categoryList"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="confirmDialog">
+    <div class="dialog-body">
+      <h2 id="confirmTitle">ยืนยันการทำรายการ</h2>
+      <p id="confirmMessage"></p>
+      <div class="dialog-actions">
+        <button class="btn" id="confirmCancel" type="button">ยกเลิก</button>
+        <button class="btn danger" id="confirmOk" type="button">ยืนยัน</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="googleDialog">
+    <form class="dialog-body" id="googleSettingsForm" method="dialog">
+      <h2>เชื่อมต่อ Google Drive</h2>
+      <p>ใส่ Web App URL จาก Google Apps Script ของบัญชี Google เพื่อให้แอปนี้สร้างไฟล์ Google Sheet ใน Drive ได้</p>
+      <label>
+        Google Apps Script Web App URL
+        <input id="googleEndpoint" placeholder="https://script.google.com/macros/s/.../exec">
+      </label>
+      <p class="helper">ต้องตั้งค่าเพียงครั้งแรก หลังจากนั้นกดปุ่ม Google Sheet เพื่อส่งออกได้ทันที</p>
+      <div class="dialog-actions">
+        <button class="btn" id="googleCancel" type="button">ยกเลิก</button>
+        <button class="btn primary" type="submit">บันทึกและส่งออก</button>
+      </div>
+    </form>
+  </dialog>
+
+  <form id="googleExportForm" method="post" target="_blank" hidden>
+    <input type="hidden" name="payload" id="googlePayload">
+  </form>
+  <form id="googleSilentExportForm" method="post" target="googleSilentFrame" hidden>
+    <input type="hidden" name="payload" id="googleSilentPayload">
+  </form>
+  <iframe name="googleSilentFrame" title="Google Sheet sync" hidden></iframe>
+
+  <script>
+    const STORAGE_KEY = "personal-ledger-commissioning-v1";
+    const OLD_STORAGE_KEYS = ["personal-ledger-v1"];
+    const GOOGLE_ENDPOINT_KEY = "personal-ledger-google-endpoint";
+    const incomeCategories = ["เงินเดือน", "งานเสริม", "ขายของ", "ดอกเบี้ย", "ของขวัญ", "อื่น ๆ"];
+    const expenseCategories = ["อาหาร", "เดินทาง", "บ้าน", "ของใช้", "สุขภาพ", "บันเทิง", "การศึกษา", "หนี้สิน", "อื่น ๆ"];
+    const sampleData = [];
+
+    OLD_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
+
+    let entries = loadEntries();
+    let activeType = "income";
+    let editingId = null;
+
+    const form = document.querySelector("#entryForm");
+    const titleInput = document.querySelector("#title");
+    const amountInput = document.querySelector("#amount");
+    const dateInput = document.querySelector("#date");
+    const categoryInput = document.querySelector("#category");
+    const accountInput = document.querySelector("#account");
+    const noteInput = document.querySelector("#note");
+    const searchInput = document.querySelector("#search");
+    const monthFilter = document.querySelector("#monthFilter");
+    const typeFilter = document.querySelector("#typeFilter");
+    const transactionsEl = document.querySelector("#transactions");
+    const emptyState = document.querySelector("#emptyState");
+    const cancelEditBtn = document.querySelector("#cancelEditBtn");
+    const formTitle = document.querySelector("#formTitle");
+    const saveBtn = document.querySelector("#saveBtn");
+    const categoryList = document.querySelector("#categoryList");
+    const chart = document.querySelector("#trendChart");
+    const confirmDialog = document.querySelector("#confirmDialog");
+    const confirmTitle = document.querySelector("#confirmTitle");
+    const confirmMessage = document.querySelector("#confirmMessage");
+    const confirmCancel = document.querySelector("#confirmCancel");
+    const confirmOk = document.querySelector("#confirmOk");
+    const googleDialog = document.querySelector("#googleDialog");
+    const googleSettingsForm = document.querySelector("#googleSettingsForm");
+    const googleEndpoint = document.querySelector("#googleEndpoint");
+    const googleExportForm = document.querySelector("#googleExportForm");
+    const googlePayload = document.querySelector("#googlePayload");
+    const googleSilentExportForm = document.querySelector("#googleSilentExportForm");
+    const googleSilentPayload = document.querySelector("#googleSilentPayload");
+    const syncStatus = document.querySelector("#syncStatus");
+    const summaryPieChart = document.querySelector("#summaryPieChart");
+    const flowIncomeLabel = document.querySelector("#flowIncomeLabel");
+    const flowExpenseLabel = document.querySelector("#flowExpenseLabel");
+    const savingRate = document.querySelector("#savingRate");
+    const savingNote = document.querySelector("#savingNote");
+    const dailyAverage = document.querySelector("#dailyAverage");
+    const dailyAverageNote = document.querySelector("#dailyAverageNote");
+    const watchCategory = document.querySelector("#watchCategory");
+    const watchCategoryNote = document.querySelector("#watchCategoryNote");
+    const money = new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 });
+    const dateFmt = new Intl.DateTimeFormat("th-TH", { dateStyle: "medium" });
+
+    dateInput.value = new Date().toISOString().slice(0, 10);
+    monthFilter.value = new Date().toISOString().slice(0, 7);
+    renderCategoryOptions();
+    render();
+
+    document.querySelectorAll("[data-type]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setActiveType(button.dataset.type);
+      });
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const entry = {
+        id: editingId || crypto.randomUUID(),
+        type: activeType,
+        title: titleInput.value.trim(),
+        amount: Number(amountInput.value),
+        date: dateInput.value,
+        category: categoryInput.value,
+        account: accountInput.value,
+        note: noteInput.value.trim()
+      };
+
+      if (!entry.title || !entry.amount || !entry.date) return;
+
+      if (editingId) {
+        entries = entries.map((item) => item.id === editingId ? entry : item);
+      } else {
+        entries = [entry, ...entries];
+      }
+
+      persist();
+      resetForm();
+      render();
+      autoSyncGoogleSheet();
+    });
+
+    [searchInput, monthFilter, typeFilter].forEach((control) => {
+      control.addEventListener("input", render);
+      control.addEventListener("change", render);
+    });
+
+    cancelEditBtn.addEventListener("click", resetForm);
+
+    document.querySelector("#clearBtn").addEventListener("click", async () => {
+      if (!entries.length) return;
+      if (await askConfirm("ล้างข้อมูลทั้งหมด", "รายการบัญชีทั้งหมดจะถูกลบออกจากเครื่องนี้")) {
+        entries = [];
+        persist();
+        resetForm();
+        render();
+        autoSyncGoogleSheet();
+      }
+    });
+
+    document.querySelector("#exportBtn").addEventListener("click", () => {
+      const payload = JSON.stringify({ exportedAt: new Date().toISOString(), entries }, null, 2);
+      const blob = new Blob([payload], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `personal-ledger-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+
+    document.querySelector("#exportCsvBtn").addEventListener("click", () => {
+      const csv = getSheetRows().map((row) => row.map(csvCell).join(",")).join("\r\n");
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `personal-ledger-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+
+    document.querySelector("#exportGoogleBtn").addEventListener("click", () => {
+      const savedEndpoint = localStorage.getItem(GOOGLE_ENDPOINT_KEY) || "";
+      if (!savedEndpoint) {
+        openGoogleSettings();
+        return;
+      }
+      submitGoogleSheet(savedEndpoint, false);
+    });
+
+    document.querySelector("#googleSettingsBtn").addEventListener("click", openGoogleSettings);
+
+    googleSettingsForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const endpoint = googleEndpoint.value.trim();
+      if (!endpoint) return;
+      localStorage.setItem(GOOGLE_ENDPOINT_KEY, endpoint);
+      googleDialog.close();
+      submitGoogleSheet(endpoint, false);
+    });
+
+    document.querySelector("#googleCancel").addEventListener("click", () => {
+      googleDialog.close();
+    });
+
+    document.querySelector("#importBtn").addEventListener("click", () => {
+      document.querySelector("#importFile").click();
+    });
+
+    document.querySelector("#importFile").addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        const imported = Array.isArray(data) ? data : data.entries;
+        if (!Array.isArray(imported)) throw new Error("Invalid file");
+        entries = imported
+          .filter((item) => item.title && item.date && Number(item.amount))
+          .map((item) => ({ ...item, id: item.id || crypto.randomUUID(), amount: Number(item.amount) }));
+        persist();
+        resetForm();
+        render();
+        autoSyncGoogleSheet();
+      } catch {
+        alert("ไฟล์นำเข้าไม่ถูกต้อง");
+      } finally {
+        event.target.value = "";
+      }
+    });
+
+    transactionsEl.addEventListener("click", async (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      const entry = entries.find((item) => item.id === button.dataset.id);
+      if (!entry) return;
+
+      if (button.dataset.action === "edit") {
+        editingId = entry.id;
+        setActiveType(entry.type);
+        titleInput.value = entry.title;
+        amountInput.value = entry.amount;
+        dateInput.value = entry.date;
+        categoryInput.value = entry.category;
+        accountInput.value = entry.account;
+        noteInput.value = entry.note || "";
+        formTitle.textContent = "แก้ไขรายการ";
+        saveBtn.lastChild.textContent = " บันทึกการแก้ไข";
+        cancelEditBtn.hidden = false;
+        titleInput.focus();
+      }
+
+      if (button.dataset.action === "delete" && await askConfirm("ลบรายการ", `ลบ "${entry.title}" ออกจากบัญชีใช่ไหม`)) {
+        entries = entries.filter((item) => item.id !== entry.id);
+        persist();
+        if (editingId === entry.id) resetForm();
+        render();
+        autoSyncGoogleSheet();
+      }
+    });
+
+    function monthDate(day) {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    }
+
+    function loadEntries() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) return sampleData;
+      try {
+        const parsed = JSON.parse(stored);
+        return Array.isArray(parsed) ? parsed : sampleData;
+      } catch {
+        return sampleData;
+      }
+    }
+
+    function persist() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function setActiveType(type) {
+      activeType = type;
+      document.querySelectorAll("[data-type]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.type === type);
+        button.classList.toggle("income", button.dataset.type === "income");
+        button.classList.toggle("expense", button.dataset.type === "expense");
+      });
+      renderCategoryOptions();
+    }
+
+    function renderCategoryOptions() {
+      const categories = activeType === "income" ? incomeCategories : expenseCategories;
+      const oldValue = categoryInput.value;
+      categoryInput.innerHTML = categories.map((category) => `<option>${category}</option>`).join("");
+      if (categories.includes(oldValue)) categoryInput.value = oldValue;
+    }
+
+    function resetForm() {
+      editingId = null;
+      form.reset();
+      setActiveType("income");
+      dateInput.value = new Date().toISOString().slice(0, 10);
+      formTitle.textContent = "เพิ่มรายการใหม่";
+      saveBtn.lastChild.textContent = " บันทึกรายการ";
+      cancelEditBtn.hidden = true;
+    }
+
+    function getFilteredEntries() {
+      const term = searchInput.value.trim().toLowerCase();
+      return entries
+        .filter((entry) => !monthFilter.value || entry.date.startsWith(monthFilter.value))
+        .filter((entry) => typeFilter.value === "all" || entry.type === typeFilter.value)
+        .filter((entry) => {
+          if (!term) return true;
+          return [entry.title, entry.category, entry.account, entry.note].join(" ").toLowerCase().includes(term);
+        })
+        .sort((a, b) => b.date.localeCompare(a.date));
+    }
+
+    function render() {
+      const filtered = getFilteredEntries();
+      const monthEntries = entries.filter((entry) => entry.date.startsWith(monthFilter.value));
+      const income = sum(monthEntries.filter((entry) => entry.type === "income"));
+      const expense = sum(monthEntries.filter((entry) => entry.type === "expense"));
+
+      document.querySelector("#incomeTotal").textContent = money.format(income);
+      document.querySelector("#expenseTotal").textContent = money.format(expense);
+      document.querySelector("#balanceTotal").textContent = money.format(income - expense);
+      document.querySelector("#countTotal").textContent = filtered.length.toLocaleString("th-TH");
+
+      renderTransactions(filtered);
+      renderSummaryDashboard(monthEntries, income, expense);
+      renderCategories(monthEntries);
+      renderChart(monthEntries);
+    }
+
+    function sum(items) {
+      return items.reduce((total, item) => total + Number(item.amount), 0);
+    }
+
+    function renderTransactions(items) {
+      emptyState.hidden = items.length > 0;
+      transactionsEl.innerHTML = items.map((entry) => {
+        const sign = entry.type === "income" ? "+" : "-";
+        const icon = entry.type === "income"
+          ? '<svg viewBox="0 0 24 24"><path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path></svg>'
+          : '<svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg>';
+        return `
+          <li class="transaction">
+            <div class="mark ${entry.type}">${icon}</div>
+            <div class="tx-main">
+              <div class="tx-title">
+                <strong>${escapeHtml(entry.title)}</strong>
+                <span class="chip">${escapeHtml(entry.category)}</span>
+              </div>
+              <div class="tx-meta">${dateFmt.format(new Date(entry.date))} · ${escapeHtml(entry.account)}${entry.note ? " · " + escapeHtml(entry.note) : ""}</div>
+            </div>
+            <div class="tx-side">
+              <div class="amount ${entry.type}">${sign}${money.format(entry.amount)}</div>
+              <div class="actions">
+                <button class="btn icon" data-action="edit" data-id="${entry.id}" title="แก้ไข">
+                  <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+                </button>
+                <button class="btn icon danger" data-action="delete" data-id="${entry.id}" title="ลบ">
+                  <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="m19 6-1 14H6L5 6"></path></svg>
+                </button>
+              </div>
+            </div>
+          </li>
+        `;
+      }).join("");
+    }
+
+    function renderCategories(items) {
+      const expenses = items.filter((entry) => entry.type === "expense");
+      const totals = expenses.reduce((map, entry) => {
+        map[entry.category] = (map[entry.category] || 0) + Number(entry.amount);
+        return map;
+      }, {});
+      const rows = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      const max = Math.max(...rows.map(([, total]) => total), 1);
+
+      categoryList.innerHTML = rows.length ? rows.map(([category, total]) => `
+        <div class="category-row">
+          <div class="cat-top"><span>${escapeHtml(category)}</span><strong>${money.format(total)}</strong></div>
+          <div class="bar"><span style="width:${Math.max(7, total / max * 100)}%"></span></div>
+        </div>
+      `).join("") : '<p class="helper">ยังไม่มีรายจ่ายในเดือนนี้</p>';
+    }
+
+    function renderSummaryDashboard(items, income, expense) {
+      const flowTotal = income + expense;
+      const incomePercent = flowTotal ? Math.round(income / flowTotal * 100) : 0;
+      const expensePercent = flowTotal ? 100 - incomePercent : 0;
+      const saved = income - expense;
+      const savingPercent = income ? Math.round(saved / income * 100) : 0;
+      const daysWithExpense = new Set(items.filter((entry) => entry.type === "expense").map((entry) => entry.date)).size || 1;
+      const topExpense = getTopExpenseCategory(items);
+
+      renderSummaryPie(income, expense);
+      flowIncomeLabel.textContent = `${incomePercent}%`;
+      flowExpenseLabel.textContent = `${expensePercent}%`;
+      savingRate.textContent = income ? `${savingPercent}%` : "0%";
+      savingRate.style.color = saved >= 0 ? "var(--green)" : "var(--red)";
+      savingNote.textContent = income
+        ? `${saved >= 0 ? "เหลือเก็บ" : "ติดลบ"} ${money.format(Math.abs(saved))} ในเดือนนี้`
+        : "ยังไม่มีรายรับในเดือนนี้";
+      dailyAverage.textContent = money.format(expense / daysWithExpense);
+      dailyAverageNote.textContent = `คิดจากวันที่มีรายจ่าย ${daysWithExpense.toLocaleString("th-TH")} วัน`;
+      watchCategory.textContent = topExpense ? topExpense.category : "-";
+      watchCategory.style.color = topExpense ? "var(--gold)" : "var(--muted)";
+      watchCategoryNote.textContent = topExpense
+        ? `${money.format(topExpense.total)} หรือ ${expense ? Math.round(topExpense.total / expense * 100) : 0}% ของรายจ่าย`
+        : "ยังไม่มีรายจ่ายในเดือนนี้";
+    }
+
+    function renderSummaryPie(income, expense) {
+      const ctx = summaryPieChart.getContext("2d");
+      const width = summaryPieChart.width;
+      const height = summaryPieChart.height;
+      const total = income + expense;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radius = Math.min(width, height) * 0.36;
+
+      ctx.clearRect(0, 0, width, height);
+
+      if (!total) {
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = "#d9e1dc";
+        ctx.lineWidth = 34;
+        ctx.stroke();
+        ctx.fillStyle = "#657269";
+        ctx.font = "700 28px system-ui";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("0", centerX, centerY - 7);
+        ctx.font = "22px system-ui";
+        ctx.fillText("รายการ", centerX, centerY + 24);
+        return;
+      }
+
+      const incomeAngle = Math.PI * 2 * (income / total);
+      drawPieSlice(ctx, centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + incomeAngle, "#237a57");
+      drawPieSlice(ctx, centerX, centerY, radius, -Math.PI / 2 + incomeAngle, Math.PI * 1.5, "#b54545");
+
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius * 0.58, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.fillStyle = "#17201b";
+      ctx.font = "800 28px system-ui";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(`${Math.round(income / total * 100)}%`, centerX, centerY - 6);
+      ctx.fillStyle = "#657269";
+      ctx.font = "22px system-ui";
+      ctx.fillText("รายรับ", centerX, centerY + 24);
+    }
+
+    function drawPieSlice(ctx, centerX, centerY, radius, start, end, color) {
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, start, end);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    function getTopExpenseCategory(items) {
+      const totals = items
+        .filter((entry) => entry.type === "expense")
+        .reduce((map, entry) => {
+          map[entry.category] = (map[entry.category] || 0) + Number(entry.amount);
+          return map;
+        }, {});
+      const rows = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+      return rows[0] ? { category: rows[0][0], total: rows[0][1] } : null;
+    }
+
+    function renderChart(items) {
+      const ctx = chart.getContext("2d");
+      const width = chart.width;
+      const height = chart.height;
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "#fbfcfb";
+      ctx.fillRect(0, 0, width, height);
+
+      const days = Array.from({ length: 31 }, (_, index) => index + 1);
+      const incomeByDay = days.map((day) => sum(items.filter((entry) => entry.type === "income" && Number(entry.date.slice(8, 10)) === day)));
+      const expenseByDay = days.map((day) => sum(items.filter((entry) => entry.type === "expense" && Number(entry.date.slice(8, 10)) === day)));
+      const max = Math.max(...incomeByDay, ...expenseByDay, 1);
+      drawGrid(ctx, width, height);
+      drawLine(ctx, incomeByDay, max, "#237a57", width, height);
+      drawLine(ctx, expenseByDay, max, "#b54545", width, height);
+
+      ctx.fillStyle = "#657269";
+      ctx.font = "22px system-ui";
+      ctx.fillText("รายรับ", 24, 34);
+      ctx.fillStyle = "#237a57";
+      ctx.fillRect(82, 20, 22, 8);
+      ctx.fillStyle = "#657269";
+      ctx.fillText("รายจ่าย", 124, 34);
+      ctx.fillStyle = "#b54545";
+      ctx.fillRect(200, 20, 22, 8);
+    }
+
+    function drawGrid(ctx, width, height) {
+      ctx.strokeStyle = "#e2e8e4";
+      ctx.lineWidth = 1;
+      for (let i = 1; i < 5; i++) {
+        const y = (height / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(18, y);
+        ctx.lineTo(width - 18, y);
+        ctx.stroke();
+      }
+    }
+
+    function drawLine(ctx, values, max, color, width, height) {
+      const padX = 22;
+      const padY = 48;
+      const usableW = width - padX * 2;
+      const usableH = height - padY - 18;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      values.forEach((value, index) => {
+        const x = padX + (usableW / (values.length - 1)) * index;
+        const y = padY + usableH - (value / max) * usableH;
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function csvCell(value) {
+      return `"${String(value ?? "").replaceAll('"', '""')}"`;
+    }
+
+    function getSheetRows() {
+      const headers = ["วันที่", "ประเภท", "รายละเอียด", "จำนวนเงิน", "หมวดหมู่", "วิธีจ่าย/รับ", "บันทึกเพิ่มเติม"];
+      const rows = entries
+        .slice()
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .map((entry) => [
+          entry.date,
+          entry.type === "income" ? "รายรับ" : "รายจ่าย",
+          entry.title,
+          Number(entry.amount).toFixed(2),
+          entry.category,
+          entry.account,
+          entry.note || ""
+        ]);
+      return [headers, ...rows];
+    }
+
+    function submitGoogleSheet(endpoint, silent) {
+      const payload = JSON.stringify({
+        fileName: "บัญชีส่วนตัว - Commissioning",
+        legacyFileNames: ["บัญชีส่วนตัว"],
+        shortcutName: "เปิดบัญชีส่วนตัว - Commissioning",
+        rows: getSheetRows(),
+        entries: entries.slice().sort((a, b) => a.date.localeCompare(b.date))
+      });
+
+      if (silent) {
+        googleSilentExportForm.action = endpoint;
+        googleSilentPayload.value = payload;
+        googleSilentExportForm.submit();
+        return;
+      }
+
+      googleExportForm.action = endpoint;
+      googlePayload.value = payload;
+      googleExportForm.submit();
+    }
+
+    function autoSyncGoogleSheet() {
+      const endpoint = localStorage.getItem(GOOGLE_ENDPOINT_KEY) || "";
+      if (!endpoint) {
+        setSyncStatus("ยังไม่ได้ตั้งค่า Google Drive อัตโนมัติ", "warn");
+        return;
+      }
+
+      setSyncStatus("กำลังบันทึกทับ Google Sheet เดิม...", "pending");
+      submitGoogleSheet(endpoint, true);
+      setTimeout(() => {
+        setSyncStatus("ส่งข้อมูลล่าสุดไป Google Sheet แล้ว", "ok");
+      }, 1200);
+    }
+
+    function setSyncStatus(message, tone) {
+      syncStatus.textContent = message;
+      syncStatus.className = `sync-status ${tone || ""}`;
+    }
+
+    function openGoogleSettings() {
+      googleEndpoint.value = localStorage.getItem(GOOGLE_ENDPOINT_KEY) || "";
+      googleDialog.showModal();
+      googleEndpoint.focus();
+    }
+
+    function askConfirm(title, message) {
+      confirmTitle.textContent = title;
+      confirmMessage.textContent = message;
+      confirmDialog.showModal();
+      return new Promise((resolve) => {
+        const close = (answer) => {
+          confirmOk.removeEventListener("click", onOk);
+          confirmCancel.removeEventListener("click", onCancel);
+          confirmDialog.removeEventListener("cancel", onCancel);
+          confirmDialog.close();
+          resolve(answer);
+        };
+        const onOk = () => close(true);
+        const onCancel = () => close(false);
+        confirmOk.addEventListener("click", onOk);
+        confirmCancel.addEventListener("click", onCancel);
+        confirmDialog.addEventListener("cancel", onCancel);
+      });
+    }
+  </script>
+</body>
+</html>
