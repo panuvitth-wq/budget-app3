@@ -229,20 +229,16 @@
     .dot.income { background: var(--green); }
     .dot.expense { background: var(--red); }
 
-    .pie-card {
-      grid-template-rows: auto 1fr auto;
-    }
-
     .pie-wrap {
-      min-height: 148px;
+      min-height: 160px;
       display: grid;
       place-items: center;
     }
 
     #summaryPieChart {
       width: 100%;
-      max-width: 230px;
-      height: 148px;
+      max-width: 250px;
+      height: 160px;
       border: 0;
       background: transparent;
     }
@@ -620,11 +616,26 @@
       .app-shell {
         width: min(100% - 20px, 1180px);
         padding-top: 14px;
+        display: flex;
+        flex-direction: column;
       }
 
       header {
         align-items: flex-start;
         flex-direction: column;
+        order: 1;
+      }
+
+      .main-grid {
+        order: 2;
+      }
+
+      .dashboard {
+        order: 3;
+      }
+
+      .summary-board {
+        order: 4;
       }
 
       .dashboard, .summary-board, .row, .filters {
@@ -703,16 +714,6 @@
     </section>
 
     <section class="summary-board" aria-label="แดชบอร์ดติดตามบัญชี">
-      <article class="summary-card pie-card">
-        <h2>ภาพรวมเงินเข้าออก</h2>
-        <div class="pie-wrap">
-          <canvas id="summaryPieChart" width="460" height="296" aria-label="Pie chart รายรับรายจ่าย"></canvas>
-        </div>
-        <div class="flow-legend">
-          <span><i class="dot income"></i>รายรับ <strong id="flowIncomeLabel">0%</strong></span>
-          <span><i class="dot expense"></i>รายจ่าย <strong id="flowExpenseLabel">0%</strong></span>
-        </div>
-      </article>
       <article class="summary-card">
         <h2>อัตราเก็บเงิน</h2>
         <div class="summary-value balance" id="savingRate">0%</div>
@@ -738,12 +739,12 @@
         </div>
         <form class="form" id="entryForm">
           <div class="segmented" role="group" aria-label="ประเภทรายการ">
-            <button type="button" class="active income" data-type="income">รายรับ</button>
-            <button type="button" data-type="expense">รายจ่าย</button>
+            <button type="button" data-type="income">รายรับ</button>
+            <button type="button" class="active expense" data-type="expense">รายจ่าย</button>
           </div>
           <label>
-            รายละเอียด
-            <input id="title" autocomplete="off" placeholder="เช่น เงินเดือน, ค่าอาหาร" required>
+            รายละเอียด / บันทึกเพิ่มเติม
+            <input id="title" autocomplete="off" placeholder="ใส่หรือไม่ใส่ก็ได้">
           </label>
           <div class="row">
             <label>
@@ -755,26 +756,12 @@
               <input id="date" type="date" required>
             </label>
           </div>
-          <div class="row">
-            <label>
-              หมวดหมู่
-              <select id="category"></select>
-            </label>
-            <label>
-              วิธีจ่าย/รับ
-              <select id="account">
-                <option>เงินสด</option>
-                <option>บัญชีธนาคาร</option>
-                <option>บัตรเครดิต</option>
-                <option>พร้อมเพย์</option>
-                <option>อื่น ๆ</option>
-              </select>
-            </label>
-          </div>
           <label>
-            บันทึกเพิ่มเติม
-            <textarea id="note" placeholder="ใส่รายละเอียดเพิ่มเติมได้"></textarea>
+            หมวดหมู่
+            <select id="category"></select>
           </label>
+          <input id="account" type="hidden" value="-">
+          <input id="note" type="hidden">
           <button class="btn primary" type="submit" id="saveBtn">
             <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><path d="M17 21v-8H7v8"></path><path d="M7 3v5h8"></path></svg>
             บันทึกรายการ
@@ -816,6 +803,16 @@
             <div class="empty" id="emptyState" hidden>ยังไม่มีรายการในเงื่อนไขนี้</div>
           </div>
           <aside class="insights">
+            <div>
+              <h2>สัดส่วนรายรับรายจ่าย</h2>
+              <div class="pie-wrap">
+                <canvas id="summaryPieChart" width="460" height="296" aria-label="Pie chart รายรับรายจ่าย"></canvas>
+              </div>
+              <div class="flow-legend">
+                <span><i class="dot income"></i>รายรับ <strong id="flowIncomeLabel">0%</strong></span>
+                <span><i class="dot expense"></i>รายจ่าย <strong id="flowExpenseLabel">0%</strong></span>
+              </div>
+            </div>
             <div>
               <h2>ภาพรวมรายวัน</h2>
               <canvas id="trendChart" width="480" height="320" aria-label="กราฟรายรับรายจ่าย"></canvas>
@@ -869,14 +866,31 @@
     const STORAGE_KEY = "personal-ledger-commissioning-v1";
     const OLD_STORAGE_KEYS = ["personal-ledger-v1"];
     const GOOGLE_ENDPOINT_KEY = "personal-ledger-google-endpoint";
-    const incomeCategories = ["เงินเดือน", "งานเสริม", "ขายของ", "ดอกเบี้ย", "ของขวัญ", "อื่น ๆ"];
-    const expenseCategories = ["อาหาร", "เดินทาง", "บ้าน", "ของใช้", "สุขภาพ", "บันเทิง", "การศึกษา", "หนี้สิน", "อื่น ๆ"];
+    const categories = [
+      "Food",
+      "Groceries",
+      "Transportation",
+      "Education",
+      "Health",
+      "Shopping",
+      "Donation",
+      "Entertainment",
+      "Traveling",
+      "Family1",
+      "Family2",
+      "Housing",
+      "Utilities",
+      "Insurance",
+      "Tax",
+      "Saving Investment",
+      "SSO/PF Other"
+    ];
     const sampleData = [];
 
     OLD_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
 
     let entries = loadEntries();
-    let activeType = "income";
+    let activeType = "expense";
     let editingId = null;
 
     const form = document.querySelector("#entryForm");
@@ -937,15 +951,15 @@
       const entry = {
         id: editingId || crypto.randomUUID(),
         type: activeType,
-        title: titleInput.value.trim(),
+        title: titleInput.value.trim() || categoryInput.value,
         amount: Number(amountInput.value),
         date: dateInput.value,
         category: categoryInput.value,
         account: accountInput.value,
-        note: noteInput.value.trim()
+        note: ""
       };
 
-      if (!entry.title || !entry.amount || !entry.date) return;
+      if (!entry.amount || !entry.date) return;
 
       if (editingId) {
         entries = entries.map((item) => item.id === editingId ? entry : item);
@@ -1107,7 +1121,6 @@
     }
 
     function renderCategoryOptions() {
-      const categories = activeType === "income" ? incomeCategories : expenseCategories;
       const oldValue = categoryInput.value;
       categoryInput.innerHTML = categories.map((category) => `<option>${category}</option>`).join("");
       if (categories.includes(oldValue)) categoryInput.value = oldValue;
@@ -1116,7 +1129,7 @@
     function resetForm() {
       editingId = null;
       form.reset();
-      setActiveType("income");
+      setActiveType("expense");
       dateInput.value = new Date().toISOString().slice(0, 10);
       formTitle.textContent = "เพิ่มรายการใหม่";
       saveBtn.lastChild.textContent = " บันทึกรายการ";
