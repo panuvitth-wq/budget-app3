@@ -3,23 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>บัญชีส่วนตัว</title>
+  <title>BudgetAppByBigg</title>
   <style>
     :root {
-      color-scheme: light;
-      --bg: #f6f7f4;
-      --surface: #ffffff;
-      --surface-2: #eef4ef;
-      --ink: #17201b;
-      --muted: #657269;
-      --line: #d9e1dc;
-      --green: #237a57;
-      --green-soft: #dff2e9;
-      --red: #b54545;
-      --red-soft: #f7e3e3;
-      --blue: #2e628f;
-      --gold: #a66b20;
-      --shadow: 0 16px 44px rgba(25, 39, 31, .12);
+      color-scheme: dark;
+      --bg: #101614;
+      --surface: #18231f;
+      --surface-2: #22302b;
+      --ink: #edf6f0;
+      --muted: #a5b5ac;
+      --line: #31433b;
+      --green: #76d7a2;
+      --green-soft: #203d31;
+      --red: #ff8d8d;
+      --red-soft: #44282c;
+      --blue: #82b7ff;
+      --gold: #f0c66a;
+      --shadow: 0 18px 46px rgba(0, 0, 0, .34);
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
@@ -33,7 +33,7 @@
       margin: 0;
       min-height: 100vh;
       background:
-        linear-gradient(180deg, rgba(35,122,87,.10), rgba(246,247,244,0) 310px),
+        linear-gradient(180deg, rgba(118, 215, 162, .11), rgba(16, 22, 20, 0) 320px),
         var(--bg);
       color: var(--ink);
     }
@@ -74,8 +74,8 @@
       border-radius: 8px;
       display: grid;
       place-items: center;
-      color: white;
-      background: linear-gradient(135deg, #237a57, #2e628f);
+      color: #ffffff;
+      background: linear-gradient(135deg, #2d9b72, #496fa8);
       box-shadow: var(--shadow);
       flex: 0 0 auto;
     }
@@ -111,13 +111,13 @@
       background: var(--surface);
       color: var(--ink);
       border: 1px solid var(--line);
-      box-shadow: 0 2px 8px rgba(20, 31, 24, .05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
       white-space: nowrap;
     }
 
     .btn.primary {
       background: var(--green);
-      color: white;
+      color: #0d1512;
       border-color: var(--green);
     }
 
@@ -150,7 +150,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      box-shadow: 0 8px 22px rgba(20, 31, 24, .06);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, .20);
     }
 
     .metric span {
@@ -170,7 +170,7 @@
 
     .summary-board {
       display: grid;
-      grid-template-columns: minmax(0, 1.25fr) repeat(3, minmax(0, .8fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -180,7 +180,7 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 16px;
-      box-shadow: 0 8px 22px rgba(20, 31, 24, .06);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, .20);
       min-height: 132px;
       display: grid;
       align-content: space-between;
@@ -269,7 +269,7 @@
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: 0 10px 28px rgba(20, 31, 24, .07);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, .24);
     }
 
     .panel-head {
@@ -305,7 +305,7 @@
       min-height: 42px;
       border-radius: 8px;
       border: 1px solid var(--line);
-      background: #fbfcfb;
+      background: #121b18;
       color: var(--ink);
       padding: 9px 11px;
       outline: 0;
@@ -318,7 +318,7 @@
 
     input:focus, select:focus, textarea:focus {
       border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(35, 122, 87, .16);
+      box-shadow: 0 0 0 3px rgba(118, 215, 162, .18);
     }
 
     .segmented {
@@ -341,12 +341,12 @@
 
     .segmented button.active.income {
       background: var(--green);
-      color: white;
+      color: #0d1512;
     }
 
     .segmented button.active.expense {
       background: var(--red);
-      color: white;
+      color: #17100c;
     }
 
     .row {
@@ -361,7 +361,7 @@
       gap: 10px;
       padding: 16px;
       border-bottom: 1px solid var(--line);
-      background: #fbfcfb;
+      background: #121b18;
     }
 
     .content {
@@ -465,6 +465,8 @@
 
     .amount.income { color: var(--green); }
     .amount.expense { color: var(--red); }
+    .income { color: var(--green); }
+    .expense { color: var(--red); }
 
     .actions {
       display: flex;
@@ -488,7 +490,7 @@
       width: 100%;
       height: 160px;
       display: block;
-      background: #fbfcfb;
+      background: #121b18;
       border: 1px solid var(--line);
       border-radius: 8px;
     }
@@ -666,8 +668,8 @@
           <svg viewBox="0 0 24 24"><path d="M4 18V7a2 2 0 0 1 2-2h12v14H6a2 2 0 0 1-2-2Z"></path><path d="M8 9h7"></path><path d="M8 13h4"></path></svg>
         </div>
         <div>
-          <h1>บัญชีส่วนตัว</h1>
-          <p class="sub">บันทึกรายรับรายจ่าย เก็บข้อมูลไว้ในเครื่องนี้</p>
+          <h1>BudgetAppByBigg</h1>
+          <p class="sub">Monthly budget tracker</p>
         </div>
       </div>
       <div class="header-actions">
@@ -704,7 +706,7 @@
         <strong class="expense" id="expenseTotal">฿0</strong>
       </article>
       <article class="metric">
-        <span>คงเหลือเดือนนี้</span>
+        <span>เงินคงเหลือทั้งหมด</span>
         <strong class="balance" id="balanceTotal">฿0</strong>
       </article>
       <article class="metric">
@@ -720,9 +722,9 @@
         <div class="summary-note" id="savingNote">ยังไม่มีรายรับในเดือนนี้</div>
       </article>
       <article class="summary-card">
-        <h2>ใช้จ่ายเฉลี่ยต่อวัน</h2>
+        <h2>เฉลี่ยรายจ่าย/รายการ</h2>
         <div class="summary-value expense" id="dailyAverage">฿0</div>
-        <div class="summary-note" id="dailyAverageNote">คำนวณจากรายจ่ายเดือนนี้</div>
+        <div class="summary-note" id="dailyAverageNote">คำนวณจากรายการรายจ่ายในเดือนนี้</div>
       </article>
       <article class="summary-card">
         <h2>หมวดที่ควรจับตา</h2>
@@ -804,7 +806,7 @@
           </div>
           <aside class="insights">
             <div>
-              <h2>สัดส่วนรายรับรายจ่าย</h2>
+              <h2>สัดส่วนรายรับรายจ่ายรายเดือน</h2>
               <div class="pie-wrap">
                 <canvas id="summaryPieChart" width="460" height="296" aria-label="Pie chart รายรับรายจ่าย"></canvas>
               </div>
@@ -814,11 +816,11 @@
               </div>
             </div>
             <div>
-              <h2>ภาพรวมรายวัน</h2>
-              <canvas id="trendChart" width="480" height="320" aria-label="กราฟรายรับรายจ่าย"></canvas>
+              <h2>เทียบกับเดือนก่อน</h2>
+              <div class="category-list" id="monthCompareList"></div>
             </div>
             <div>
-              <h2>หมวดรายจ่ายสูงสุด</h2>
+              <h2>เฉลี่ยรายจ่ายตาม Category</h2>
               <div class="category-list" id="categoryList"></div>
             </div>
           </aside>
@@ -866,7 +868,14 @@
     const STORAGE_KEY = "personal-ledger-commissioning-v1";
     const OLD_STORAGE_KEYS = ["personal-ledger-v1"];
     const GOOGLE_ENDPOINT_KEY = "personal-ledger-google-endpoint";
-    const categories = [
+    const incomeCategories = [
+      "Salary",
+      "Allowane",
+      "Investment",
+      "Gift",
+      "Bonus"
+    ];
+    const expenseCategories = [
       "Food",
       "Groceries",
       "Transportation",
@@ -909,7 +918,7 @@
     const formTitle = document.querySelector("#formTitle");
     const saveBtn = document.querySelector("#saveBtn");
     const categoryList = document.querySelector("#categoryList");
-    const chart = document.querySelector("#trendChart");
+    const monthCompareList = document.querySelector("#monthCompareList");
     const confirmDialog = document.querySelector("#confirmDialog");
     const confirmTitle = document.querySelector("#confirmTitle");
     const confirmMessage = document.querySelector("#confirmMessage");
@@ -1121,6 +1130,7 @@
     }
 
     function renderCategoryOptions() {
+      const categories = activeType === "income" ? incomeCategories : expenseCategories;
       const oldValue = categoryInput.value;
       categoryInput.innerHTML = categories.map((category) => `<option>${category}</option>`).join("");
       if (categories.includes(oldValue)) categoryInput.value = oldValue;
@@ -1153,16 +1163,18 @@
       const monthEntries = entries.filter((entry) => entry.date.startsWith(monthFilter.value));
       const income = sum(monthEntries.filter((entry) => entry.type === "income"));
       const expense = sum(monthEntries.filter((entry) => entry.type === "expense"));
+      const allIncome = sum(entries.filter((entry) => entry.type === "income"));
+      const allExpense = sum(entries.filter((entry) => entry.type === "expense"));
 
       document.querySelector("#incomeTotal").textContent = money.format(income);
       document.querySelector("#expenseTotal").textContent = money.format(expense);
-      document.querySelector("#balanceTotal").textContent = money.format(income - expense);
+      document.querySelector("#balanceTotal").textContent = money.format(allIncome - allExpense);
       document.querySelector("#countTotal").textContent = filtered.length.toLocaleString("th-TH");
 
       renderTransactions(filtered);
       renderSummaryDashboard(monthEntries, income, expense);
       renderCategories(monthEntries);
-      renderChart(monthEntries);
+      renderMonthComparison(monthFilter.value, monthEntries);
     }
 
     function sum(items) {
@@ -1205,18 +1217,25 @@
     function renderCategories(items) {
       const expenses = items.filter((entry) => entry.type === "expense");
       const totals = expenses.reduce((map, entry) => {
-        map[entry.category] = (map[entry.category] || 0) + Number(entry.amount);
+        if (!map[entry.category]) {
+          map[entry.category] = { total: 0, count: 0 };
+        }
+        map[entry.category].total += Number(entry.amount);
+        map[entry.category].count += 1;
         return map;
       }, {});
-      const rows = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 5);
-      const max = Math.max(...rows.map(([, total]) => total), 1);
+      const rows = Object.entries(totals)
+        .map(([category, value]) => ({ category, total: value.total, count: value.count, average: value.total / value.count }))
+        .sort((a, b) => b.total - a.total);
+      const max = Math.max(...rows.map((row) => row.total), 1);
 
-      categoryList.innerHTML = rows.length ? rows.map(([category, total]) => `
+      categoryList.innerHTML = rows.length ? rows.map((row) => `
         <div class="category-row">
-          <div class="cat-top"><span>${escapeHtml(category)}</span><strong>${money.format(total)}</strong></div>
-          <div class="bar"><span style="width:${Math.max(7, total / max * 100)}%"></span></div>
+          <div class="cat-top"><span>${escapeHtml(row.category)}</span><strong>${money.format(row.average)}</strong></div>
+          <div class="helper">รวม ${money.format(row.total)} · ${row.count.toLocaleString("th-TH")} รายการ</div>
+          <div class="bar"><span style="width:${Math.max(7, row.total / max * 100)}%"></span></div>
         </div>
-      `).join("") : '<p class="helper">ยังไม่มีรายจ่ายในเดือนนี้</p>';
+      `).join("") : '<p class="helper">ยังไม่มีรายจ่ายในเดือนที่เลือก</p>';
     }
 
     function renderSummaryDashboard(items, income, expense) {
@@ -1225,7 +1244,7 @@
       const expensePercent = flowTotal ? 100 - incomePercent : 0;
       const saved = income - expense;
       const savingPercent = income ? Math.round(saved / income * 100) : 0;
-      const daysWithExpense = new Set(items.filter((entry) => entry.type === "expense").map((entry) => entry.date)).size || 1;
+      const expenseCount = items.filter((entry) => entry.type === "expense").length || 1;
       const topExpense = getTopExpenseCategory(items);
 
       renderSummaryPie(income, expense);
@@ -1236,8 +1255,8 @@
       savingNote.textContent = income
         ? `${saved >= 0 ? "เหลือเก็บ" : "ติดลบ"} ${money.format(Math.abs(saved))} ในเดือนนี้`
         : "ยังไม่มีรายรับในเดือนนี้";
-      dailyAverage.textContent = money.format(expense / daysWithExpense);
-      dailyAverageNote.textContent = `คิดจากวันที่มีรายจ่าย ${daysWithExpense.toLocaleString("th-TH")} วัน`;
+      dailyAverage.textContent = money.format(expense / expenseCount);
+      dailyAverageNote.textContent = `คิดจากรายจ่าย ${expenseCount.toLocaleString("th-TH")} รายการในเดือนนี้`;
       watchCategory.textContent = topExpense ? topExpense.category : "-";
       watchCategory.style.color = topExpense ? "var(--gold)" : "var(--muted)";
       watchCategoryNote.textContent = topExpense
@@ -1259,10 +1278,10 @@
       if (!total) {
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        ctx.strokeStyle = "#d9e1dc";
+        ctx.strokeStyle = "#31433b";
         ctx.lineWidth = 34;
         ctx.stroke();
-        ctx.fillStyle = "#657269";
+        ctx.fillStyle = "#a5b5ac";
         ctx.font = "700 28px system-ui";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -1273,21 +1292,62 @@
       }
 
       const incomeAngle = Math.PI * 2 * (income / total);
-      drawPieSlice(ctx, centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + incomeAngle, "#237a57");
-      drawPieSlice(ctx, centerX, centerY, radius, -Math.PI / 2 + incomeAngle, Math.PI * 1.5, "#b54545");
+      drawPieSlice(ctx, centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + incomeAngle, "#76d7a2");
+      drawPieSlice(ctx, centerX, centerY, radius, -Math.PI / 2 + incomeAngle, Math.PI * 1.5, "#ff8d8d");
 
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius * 0.58, 0, Math.PI * 2);
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#18231f";
       ctx.fill();
-      ctx.fillStyle = "#17201b";
+      ctx.fillStyle = "#edf6f0";
       ctx.font = "800 28px system-ui";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(`${Math.round(income / total * 100)}%`, centerX, centerY - 6);
-      ctx.fillStyle = "#657269";
+      ctx.fillStyle = "#a5b5ac";
       ctx.font = "22px system-ui";
       ctx.fillText("รายรับ", centerX, centerY + 24);
+    }
+
+    function renderMonthComparison(monthValue, monthEntries) {
+      if (!monthValue) {
+        monthCompareList.innerHTML = '<p class="helper">เลือกเดือนเพื่อดูเทียบกับเดือนก่อน</p>';
+        return;
+      }
+
+      const previousMonth = getPreviousMonth(monthValue);
+      const current = monthTotals(monthEntries);
+      const previousEntries = entries.filter((entry) => entry.date.startsWith(previousMonth));
+      const previous = monthTotals(previousEntries);
+      const rows = [
+        ["รายรับ", current.income, previous.income],
+        ["รายจ่าย", current.expense, previous.expense],
+        ["คงเหลือ", current.balance, previous.balance]
+      ];
+
+      monthCompareList.innerHTML = rows.map(([label, currentValue, previousValue]) => {
+        const diff = currentValue - previousValue;
+        const tone = diff >= 0 ? "income" : "expense";
+        const sign = diff >= 0 ? "+" : "-";
+        return `
+          <div class="category-row">
+            <div class="cat-top"><span>${label}</span><strong>${money.format(currentValue)}</strong></div>
+            <div class="helper">เทียบ ${previousMonth}: <span class="${tone}">${sign}${money.format(Math.abs(diff))}</span></div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function monthTotals(items) {
+      const income = sum(items.filter((entry) => entry.type === "income"));
+      const expense = sum(items.filter((entry) => entry.type === "expense"));
+      return { income, expense, balance: income - expense };
+    }
+
+    function getPreviousMonth(monthValue) {
+      const [year, month] = monthValue.split("-").map(Number);
+      const date = new Date(year, month - 2, 1);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
     }
 
     function drawPieSlice(ctx, centerX, centerY, radius, start, end, color) {
