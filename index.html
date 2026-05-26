@@ -866,6 +866,7 @@
 
   <script>
     const STORAGE_KEY = "personal-ledger-commissioning-v1";
+    const DELETED_STORAGE_KEY = "personal-ledger-commissioning-deleted-v1";
     const OLD_STORAGE_KEYS = ["personal-ledger-v1"];
     const GOOGLE_ENDPOINT_KEY = "personal-ledger-google-endpoint";
     const incomeCategories = [
@@ -899,6 +900,7 @@
     OLD_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
 
     let entries = loadEntries();
+    let deletedEntries = loadDeletedEntries();
     let activeType = "expense";
     let editingId = null;
 
@@ -957,8 +959,12 @@
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
+      const now = new Date().toISOString();
+      const existing = editingId ? entries.find((item) => item.id === editingId) : null;
       const entry = {
         id: editingId || crypto.randomUUID(),
+        createdAt: existing?.createdAt || now,
+        updatedAt: now,
         type: activeType,
         title: titleInput.value.trim() || categoryInput.value,
         amount: Number(amountInput.value),
@@ -992,6 +998,7 @@
     document.querySelector("#clearBtn").addEventListener("click", async () => {
       if (!entries.length) return;
       if (await askConfirm("ล้างข้อมูลทั้งหมด", "รายการบัญชีทั้งหมดจะถูกลบออกจากเครื่องนี้")) {
+        entries.forEach(addDeletedEntry);
         entries = [];
         persist();
         resetForm();
@@ -1055,9 +1062,16 @@
         const data = JSON.parse(await file.text());
         const imported = Array.isArray(data) ? data : data.entries;
         if (!Array.isArray(imported)) throw new Error("Invalid file");
+        const now = new Date().toISOString();
         entries = imported
           .filter((item) => item.title && item.date && Number(item.amount))
-          .map((item) => ({ ...item, id: item.id || crypto.randomUUID(), amount: Number(item.amount) }));
+          .map((item) => ({
+            ...item,
+            id: item.id || crypto.randomUUID(),
+            createdAt: item.createdAt || item.updatedAt || now,
+            updatedAt: item.updatedAt || item.createdAt || now,
+            amount: Number(item.amount)
+          }));
         persist();
         resetForm();
         render();
@@ -1091,6 +1105,7 @@
       }
 
       if (button.dataset.action === "delete" && await askConfirm("ลบรายการ", `ลบ "${entry.title}" ออกจากบัญชีใช่ไหม`)) {
+        addDeletedEntry(entry);
         entries = entries.filter((item) => item.id !== entry.id);
         persist();
         if (editingId === entry.id) resetForm();
@@ -1109,7 +1124,7 @@
       if (!stored) return sampleData;
       try {
         const parsed = JSON.parse(stored);
-        return Array.isArray(parsed) ? parsed : sampleData;
+        return Array.isArray(parsed) ? parsed.map(normalizeLocalEntry) : sampleData;
       } catch {
         return sampleData;
       }
@@ -1117,6 +1132,34 @@
 
     function persist() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      localStorage.setItem(DELETED_STORAGE_KEY, JSON.stringify(deletedEntries));
+    }
+
+    function loadDeletedEntries() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(DELETED_STORAGE_KEY) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function normalizeLocalEntry(entry) {
+      const now = new Date().toISOString();
+      return {
+        ...entry,
+        id: entry.id || crypto.randomUUID(),
+        createdAt: entry.createdAt || entry.updatedAt || now,
+        updatedAt: entry.updatedAt || entry.createdAt || now,
+        amount: Number(entry.amount || 0)
+      };
+    }
+
+    function addDeletedEntry(entry) {
+      deletedEntries = [
+        ...deletedEntries.filter((item) => item.id !== entry.id),
+        { id: entry.id, deletedAt: new Date().toISOString() }
+      ].slice(-500);
     }
 
     function setActiveType(type) {
@@ -1440,18 +1483,20 @@
     }
 
     function getSheetRows() {
-      const headers = ["วันที่", "ประเภท", "รายละเอียด", "จำนวนเงิน", "หมวดหมู่", "วิธีจ่าย/รับ", "บันทึกเพิ่มเติม"];
+      const headers = ["ID", "วันที่", "ประเภท", "รายละเอียด", "จำนวนเงิน", "หมวดหมู่", "วิธีจ่าย/รับ", "บันทึกเพิ่มเติม", "Updated At"];
       const rows = entries
         .slice()
         .sort((a, b) => a.date.localeCompare(b.date))
         .map((entry) => [
+          entry.id,
           entry.date,
           entry.type === "income" ? "รายรับ" : "รายจ่าย",
           entry.title,
           Number(entry.amount).toFixed(2),
           entry.category,
           entry.account,
-          entry.note || ""
+          entry.note || "",
+          entry.updatedAt || ""
         ]);
       return [headers, ...rows];
     }
@@ -1462,7 +1507,8 @@
         legacyFileNames: ["บัญชีส่วนตัว"],
         shortcutName: "เปิดบัญชีส่วนตัว - Commissioning",
         rows: getSheetRows(),
-        entries: entries.slice().sort((a, b) => a.date.localeCompare(b.date))
+        entries: entries.slice().sort((a, b) => a.date.localeCompare(b.date)),
+        deletedEntries
       });
 
       if (silent) {
